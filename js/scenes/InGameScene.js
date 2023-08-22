@@ -97,10 +97,10 @@ class InGameScene extends Phaser.Scene {
   }
 
   preload () {
-    this.load.image("dice-albedo", "/js/elements/dice-albedo.png");
-    this.load.obj("dice-obj", "/js/elements/dice.obj");
-    this.load.image("correct-alert", "/img/alert-correct.webp");
-    this.load.image("wrong-alert", "/img/alert-wrong.webp");
+    this.load.image("dice-albedo", "/math-snadder/js/elements/dice-albedo.png");
+    this.load.obj("dice-obj", "/math-snadder/js/elements/dice.obj");
+    this.load.image("correct-alert", "/math-snadder/img/alert-correct.webp");
+    this.load.image("wrong-alert", "/math-snadder/img/alert-wrong.webp");
   }
 
   create () {
