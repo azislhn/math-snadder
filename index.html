@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math in Snakes and Ladders</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    body {
+      background-color: #101010;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    #container {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: calc((100vh * 2 / 3));
+      overflow: hidden;
+    }
+
+    /* 
+    table {
+      background-color: cadetblue;
+      position: relative;
+      border-collapse: collapse;
+      width: 60%;
+      margin: 0 auto;
+      font-size: 2vh;
+      color: #fff;
+    }
+
+    tr {
+      border-bottom: 1px solid #ddd;
+    }
+
+    td {
+      padding: 10px 0;
+    } */
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <table id="table"></table>
+  </div>
+
+  <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <!-- <script src="./js/phaser.min.js"></script> -->
+  <script src="./js/elements/dice.js"></script>
+  <script src="./js/elements/alert.js"></script>
+  <script src="./js/scenes/menus/PickPlayerMenu.js"></script>
+  <script src="./js/scenes/menus/HistoryMenu.js"></script>
+  <script src="./js/scenes/menus/HowtoPlayMenu.js"></script>
+  <script src="./js/scenes/MainMenuScene.js"></script>
+  <script src="./js/scenes/InGameScene.js"></script>
+  <script src="./js/scenes/QuestionScene.js"></script>
+  <script src="./js/game.js"></script>
+</body>
+
+</html>
