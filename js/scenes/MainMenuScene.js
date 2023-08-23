@@ -41,7 +41,7 @@ class MainMenuScene extends Phaser.Scene {
         historyData.push(list);
       });
     }
-    this.load.image('background', './math-snadder/img/main-bg.jpg');
+    this.load.image('background', './img/main-bg.jpg');
     this.load.image('close', '/math-snadder/img/icons/cancel.png');
     this.load.image('button', '/math-snadder/img/icons/button.png');
     this.load.image('pick-menu', '/math-snadder/img/pick-bg.png');
