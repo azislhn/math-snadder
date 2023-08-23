@@ -42,10 +42,10 @@ class MainMenuScene extends Phaser.Scene {
       });
     }
     this.load.image('background', './img/main-bg.jpg');
-    this.load.image('close', '/math-snadder/img/icons/cancel.png');
-    this.load.image('button', '/math-snadder/img/icons/button.png');
-    this.load.image('pick-menu', '/math-snadder/img/pick-bg.png');
-    this.load.image('forest-board', '/math-snadder/img/board1.webp');
+    this.load.image('close', './img/icons/cancel.png');
+    this.load.image('button', './img/icons/button.png');
+    this.load.image('pick-menu', './img/pick-bg.png');
+    this.load.image('forest-board', './img/board1.webp');
   }
 
   create () {
