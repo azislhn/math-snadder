@@ -15,7 +15,7 @@ const createBoard = (scene, size, offset) => {
 
       const color = counter % 2 == 0 ? 0x808080 : 0xffffff;
       const tile = scene.add.rectangle(x, y, tileSize, tileSize, color).setOrigin(0);
-      tile.setAlpha(0)
+      tile.setAlpha(0);
       tile.setName(counter);
       tileList.push(tile);
 
@@ -41,6 +41,7 @@ const createSnakeAndLadder = (scene, board, snakeAndLadderArray = []) => {
       // const color = data.type === 'snake' ? '#f00' : (data.type === 'ladder' ? '#0f0' : null);
 
       startIndex.setData({ moveTo: endIndex.name });
+      console.log(startIndex.name, startIndex.getData('moveTo'));
 
       // const text = scene.add.text(startIndex.x + 10, startIndex.y + 10, `to ${endIndex.name}`, { fontSize: '20px', fill: color, fontStyle: 'bold' });
       datas.push(startIndex);
@@ -58,7 +59,7 @@ const createPlayer = (scene, board, color, sprite) => {
   const initY = initPosition.y + initPosition.height / 2;
 
   const pawn = scene.add.circle(initX, initY, initPosition.width / 5, color.key);
-  pawn.setStrokeStyle(2, 0xffffff)
+  pawn.setStrokeStyle(2, 0xffffff);
   pawn.setName(color.name);
   pawn.setData({ name: color.name, position: initPosition.name, movementTotal: 0 });
 
@@ -77,38 +78,65 @@ class InGameScene extends Phaser.Scene {
       hours: date.getHours(),
       minutes: date.getMinutes()
     };
-
+    this.theme = data.theme;
     this.numPlayers = data.option || 2;
-    this.playerColors = [
-      { name: 'Red', key: 0xff0000 },
-      { name: 'Green', key: 0x00ff00 },
-      { name: 'Blue', key: 0x0000ff },
-      { name: 'Yellow', key: 0xffff00 }
-    ];
+    this.playerColors = data.playerColors;
     this.boardSize = 6;
-    this.snakesAndLadders = [
-      { type: 'snake', from: 11, to: 3 },
-      { type: 'snake', from: 22, to: 18 },
-      { type: 'snake', from: 35, to: 27 },
-      { type: 'ladder', from: 8, to: 16 },
-      { type: 'ladder', from: 13, to: 24 },
-      { type: 'ladder', from: 29, to: 32 },
-    ];
+    console.log(data);
   }
 
   preload () {
+    this.playerIndex = 0;
+    this.diceValue = 1;
     this.load.image("dice-albedo", "./js/elements/dice-albedo.png");
     this.load.obj("dice-obj", "./js/elements/dice.obj");
+    this.load.image('question-bg', './img/question-bg.png');
     this.load.image("correct-alert", "./img/alert-correct.webp");
     this.load.image("wrong-alert", "./img/alert-wrong.webp");
+    switch (this.theme) {
+      case 'forest-board':
+        this.snakesAndLadders = [
+          { type: 'snake', from: 11, to: 3 },
+          { type: 'snake', from: 22, to: 18 },
+          { type: 'snake', from: 35, to: 27 },
+          { type: 'ladder', from: 8, to: 16 },
+          { type: 'ladder', from: 13, to: 24 },
+          { type: 'ladder', from: 29, to: 32 },
+        ];
+        break;
+      case 'space-board':
+        this.snakesAndLadders = [
+          { type: 'snake', from: 11, to: 4 },
+          { type: 'snake', from: 20, to: 15 },
+          { type: 'snake', from: 34, to: 26 },
+          { type: 'ladder', from: 7, to: 16 },
+          { type: 'ladder', from: 13, to: 23 },
+          { type: 'ladder', from: 28, to: 31 },
+        ];
+        break;
+      default:
+        break;
+    }
+    this.load.on('progress', (value) => {
+      this.loader = new Loader(this, value);
+    });
   }
 
   create () {
-    this.cameras.main.setBackgroundColor('#000');
-    this.add.image(0, 0, 'forest-board').setOrigin(0);
-    this.add.text(20, this.game.config.height - 40, `ID: ${uid}`, { fontSize: '20px', fill: '#fff', fontStyle: 'bold' });
-    this.playerIndex = 0;
-    this.diceValue = 1;
+    this.load.on('complete', () => {
+      this.loader.destroy();
+    });
+    this.add.image(0, 0, this.theme).setOrigin(0);
+
+    const close = this.add.sprite(this.cameras.main.width - 50, 50, 'close');
+    close.setScale(0.5);
+    close.setInteractive({ cursor: 'pointer' });
+    close.on('pointerup', () => {
+      if (confirm('Quit the game?')) {
+        this.scene.stop(this);
+        this.scene.start('MainMenuScene');
+      }
+    });
 
     const offset = 50;
     const boardContainer = this.add.container(offset / 2, 100);
@@ -136,8 +164,8 @@ class InGameScene extends Phaser.Scene {
       this.game.config.width / 2,
       this.game.config.height - 100,
       `${this.players[this.playerIndex].name}'s Turn`,
-      { ...FONT_STYLE, fill: "#fff", fontSize: "24px" }
-    ).setOrigin(0.5);
+      { ...FONT_STYLE, fill: "#fff", fontSize: "30px" }
+    ).setStroke(colors.black, 4).setOrigin(0.5);
 
     const dice = createDice(config.width / 2, config.height - 200, this, 1000);
     // Dice hit area
@@ -169,7 +197,7 @@ class InGameScene extends Phaser.Scene {
 
     if (position + diceValue <= finish && diceValue !== null) {
       this.scene.pause(this);
-      this.scene.launch('QuestionScene');
+      this.scene.launch('QuestionMenu');
     } else {
       this.updateIndex();
     }
@@ -234,7 +262,7 @@ class InGameScene extends Phaser.Scene {
       x: tile.x + tile.width / 2,
       y: tile.y + tile.width / 2,
       ease: 'Linear',
-      duration: 300,
+      duration: 500,
       onComplete: () => {
         target.setData('position', tile.name);
         const moveTotal = target.getData('movementTotal') + 1;

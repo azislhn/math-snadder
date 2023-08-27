@@ -13,7 +13,7 @@ var colors = {
   gray: 0x808080
 };
 
-var uid = new Date().getTime();
+// var uid = new Date().getTime();
 
 var historyData = []
 var logs = localStorage.getItem('game-log');
@@ -27,7 +27,7 @@ var config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   backgroundColor: 0x000000,
-  scene: [MainMenuScene, PickPlayerMenu, HistoryMenu, HowtoPlayMenu, InGameScene, QuestionScene],
+  scene: [MainMenuScene, PickPlayerMenu, HistoryScene, HowtoPlayMenu, InGameScene, QuestionMenu],
   // scene: [InGameScene, QuestionScene]
 };
 

@@ -1,4 +1,4 @@
-class HistoryMenu extends Phaser.Scene {
+class HistoryScene extends Phaser.Scene {
   constructor () {
     super({ key: 'HistoryMenu' });
   }
@@ -11,8 +11,7 @@ class HistoryMenu extends Phaser.Scene {
     const bg = this.add.sprite(0, 0, 'background');
     bg.setOrigin(0);
 
-    const box = this.add.rectangle(config.width / 2, config.height / 2, 600, 800, 0x000000);
-    box.setAlpha(0.8);
+    const box = this.add.sprite(config.width / 2, config.height / 2, 'pick-menu');
 
     const title = this.add.text(
       box.x,
@@ -34,8 +33,8 @@ class HistoryMenu extends Phaser.Scene {
 
     console.log(this.data);
 
-    const close = this.add.sprite(box.x + box.width / 2, box.y - box.height / 2, 'close');
-    close.setScale(0.1);
+    const close = this.add.sprite(box.x + 10 + box.width / 2, box.y - 10 - box.height / 2, 'close');
+    close.setScale(0.5);
     close.setInteractive({ cursor: 'pointer' })
     close.on('pointerup', () => {
       this.scene.start('MainMenuScene');

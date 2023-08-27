@@ -22,13 +22,13 @@ class Alert extends Phaser.GameObjects.Container {
   }
 }
 
-class QuestionScene extends Phaser.Scene {
+class QuestionMenu extends Phaser.Scene {
   constructor () {
-    super({ key: 'QuestionScene' });
+    super({ key: 'QuestionMenu' });
   }
 
   init () {
-    this.nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, 'OK'];
+    this.nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'CLEAR', 0, 'OK'];
     this.ops = ['/', '*', '+', '-'];
     this.buttons = [];
     this.inputValue = '';
@@ -48,24 +48,25 @@ class QuestionScene extends Phaser.Scene {
     let num2;
     const rendered = this.mathOperation(num1, num2);
 
-    const bgOverlay = this.add.rectangle(this.game.config.width / 2, this.game.config.height / 2, 600, 600, 0xffffff);
-    bgOverlay.setStrokeStyle(2, 0x000000);
-    const tileX = bgOverlay.x / 2;
-    const tileY = bgOverlay.height - 50;
+    // const bg = this.add.rectangle(this.game.config.width / 2, this.game.config.height / 2, 600, 600, 0xffffff);
+    // bg.setStrokeStyle(2, 0x000000);
+    const bg = this.add.sprite(this.game.config.width / 2, this.game.config.height / 2, 'question-bg');
+    const tileX = bg.x / 2 + 10;
+    const tileY = bg.height - 85;
 
     const questionText = this.add.text(
-      bgOverlay.x - 280,
-      bgOverlay.y - 280,
+      bg.x - 260,
+      bg.y - 260,
       `${rendered.num1} ${this.operator} ${rendered.num2}`,
-      { ...FONT_STYLE, fill: '#000', fontSize: '40px' });
-    const text = this.add.text(bgOverlay.x - 280, bgOverlay.y - 200, '= ', { ...FONT_STYLE, fill: '#000', fontSize: '40px' });
+      { ...FONT_STYLE, fontSize: '40px' });
+    const text = this.add.text(bg.x - 260, bg.y - 200, '= ', { ...FONT_STYLE, fontSize: '40px' });
 
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         const index = i * 3 + j;
-        const x = tileX + (j * 200);
+        const x = tileX + (j * 190);
         const y = tileY + (i * 100);
-        const tile = this.add.rectangle(x, y, 200, 100, buttonColor).setStrokeStyle(2, 0x000000);
+        const tile = this.add.rectangle(x, y, 190, 100, buttonColor);
         const text = this.add.text(x, y, this.nums[index], { fontSize: '24px', fill: '#000', fontStyle: 'bold' }).setOrigin(0.5);
         tile.name = this.nums[index];
         tile.setInteractive();
@@ -82,10 +83,11 @@ class QuestionScene extends Phaser.Scene {
     this.buttons.forEach((btn) => {
       btn.setInteractive();
       btn.on('pointerup', () => {
-        if (btn.name !== 'DEL' && btn.name !== 'OK') {
+        btn.fillColor = buttonColor;
+        if (btn.name !== 'CLEAR' && btn.name !== 'OK') {
           this.inputValue += btn.name;
         }
-        if (btn.name === 'DEL') {
+        if (btn.name === 'CLEAR') {
           this.inputValue = '';
         }
         if (btn.name === 'OK') {
