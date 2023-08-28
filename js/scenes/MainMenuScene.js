@@ -113,6 +113,6 @@ class MainMenuScene extends Phaser.Scene {
       this.scene.launch('HowtoPlayMenu');
     });
 
-    this.add.text(20, this.game.config.height - 40, `github.com/azislhn`, { fontSize: '20px', fill: '#fff', fontStyle: 'bold' });
+    this.add.text(20, this.game.config.height - 40, gameId, { fontSize: '20px', fill: '#fff', fontStyle: 'bold' });
   }
 }

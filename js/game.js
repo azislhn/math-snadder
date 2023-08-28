@@ -24,10 +24,27 @@ function getCookie (cname) {
 
 var gameId = getCookie('snaddermath');
 if (gameId != '') {
+  const dRef = database.ref(`${gameId}`);
+  dRef.once('value')
+    .then(snapshot => {
+      const userData = snapshot.val();
+      if (userData) {
+        console.log('Retrieved user data from Firebase:', userData);
+        // Use the retrieved user data...
+      } else {
+        console.log('User data not found in Firebase.');
+      }
+    })
+    .catch(error => {
+      console.error('Error retrieving user data:', error);
+    });
   console.log("This app is using cookies");
 } else {
   document.cookie = `snaddermath=${new Date().getTime()}; expires=${new Date(9999, 0, 1).toUTCString()}`;
   gameId = getCookie('snaddermath');
+  const ref = database.ref(`${gameId}`);
+  const init = ref.push();
+  init.set('');
 }
 
 var FONT_FAMILY = 'Verdana, "Times New Roman", Tahoma, serif'; // Replace with your desired font family
