@@ -42,8 +42,8 @@ if (gameId != '') {
 } else {
   document.cookie = `snaddermath=${new Date().getTime()}; expires=${new Date(9999, 0, 1).toUTCString()}`;
   gameId = getCookie('snaddermath');
-  const ref = database.ref(`${gameId}`);
-  const init = ref.push();
+  const dRef = database.ref(`${gameId}`);
+  const init = dRef.push();
   init.set('');
 }
 
