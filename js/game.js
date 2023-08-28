@@ -1,3 +1,35 @@
+const firebaseConfig = {
+  databaseURL: 'https://snadder-math-default-rtdb.asia-southeast1.firebasedatabase.app/'
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const database = firebase.database();
+
+function getCookie (cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+var gameId = getCookie('snaddermath');
+if (gameId != '') {
+  console.log("This app is using cookies");
+} else {
+  document.cookie = `snaddermath=${new Date().getTime()}; expires=${new Date(9999, 0, 1).toUTCString()}`;
+  gameId = getCookie('snaddermath');
+}
+
 var FONT_FAMILY = 'Verdana, "Times New Roman", Tahoma, serif'; // Replace with your desired font family
 var FONT_SIZE = '32px'; // Replace with your desired font size
 var FONT_STYLE = {
@@ -7,16 +39,11 @@ var FONT_STYLE = {
   fontStyle: 'bold'
 };
 
-var colors = {
+var COLORS = {
   black: 0x000000,
   white: 0xffffff,
   gray: 0x808080
 };
-
-// var uid = new Date().getTime();
-
-var historyData = []
-var logs = localStorage.getItem('game-log');
 
 var config = {
   type: Phaser.AUTO,
@@ -27,7 +54,7 @@ var config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   backgroundColor: 0x000000,
-  scene: [MainMenuScene, PickPlayerMenu, HistoryScene, HowtoPlayMenu, InGameScene, QuestionMenu],
+  scene: [MainMenuScene, PickPlayerMenu, HowtoPlayMenu, InGameScene, QuestionMenu],
   // scene: [InGameScene, QuestionScene]
 };
 

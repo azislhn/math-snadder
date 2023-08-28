@@ -1,8 +1,8 @@
-const createBoard = (scene, size, offset) => {
-  const width = config.width - offset;
+// create board
+const createBoard = (scene, size, offsetX) => {
+  const width = config.width - offsetX;
   const tileSize = width / size;
   const tileList = [];
-  // const tileNumber = [];
   let counter = 1;
 
   for (let i = size - 1; i >= 0; i--) {
@@ -19,10 +19,6 @@ const createBoard = (scene, size, offset) => {
       tile.setName(counter);
       tileList.push(tile);
 
-      // const fontSize = tileSize * 0.2;
-      // const text = scene.add.text(x + fontSize, y + fontSize, counter.toString(), { fontSize: `${fontSize}px`, fill: '#000', fontStyle: 'bold' });
-      // tileNumber.push(text);
-      // text.bringToTop()
       counter++;
     }
   }
@@ -30,6 +26,7 @@ const createBoard = (scene, size, offset) => {
   return { tileList };
 };
 
+// create snakeladder
 const createSnakeAndLadder = (scene, board, snakeAndLadderArray = []) => {
   let datas = [];
 
@@ -53,7 +50,8 @@ const createSnakeAndLadder = (scene, board, snakeAndLadderArray = []) => {
   return datas;
 };
 
-const createPlayer = (scene, board, color, sprite) => {
+// create player
+const createPlayer = (scene, board, color) => {
   const initPosition = board[0];
   const initX = initPosition.x + initPosition.width / 2;
   const initY = initPosition.y + initPosition.height / 2;
@@ -61,7 +59,13 @@ const createPlayer = (scene, board, color, sprite) => {
   const pawn = scene.add.circle(initX, initY, initPosition.width / 5, color.key);
   pawn.setStrokeStyle(2, 0xffffff);
   pawn.setName(color.name);
-  pawn.setData({ name: color.name, position: initPosition.name, movementTotal: 0 });
+  pawn.setData({
+    name: color.name,
+    position: initPosition.name,
+    correctAnswer: 0,
+    wrongAnswer: 0,
+    rollTotal: 0
+  });
 
   return pawn;
 };
@@ -72,27 +76,33 @@ class InGameScene extends Phaser.Scene {
   }
 
   init (data) {
-    const date = new Date();
-    this.locale = date.toLocaleDateString('id-ID');
-    this.time = {
-      hours: date.getHours(),
-      minutes: date.getMinutes()
-    };
     this.theme = data.theme;
     this.numPlayers = data.option || 2;
     this.playerColors = data.playerColors;
-    this.boardSize = 6;
     console.log(data);
   }
 
   preload () {
+    this.date = new Date();
+    // this.clock = {
+    //   year: date.getFullYear(),
+    //   month: date.getMonth() + 1,
+    //   day: date.getDate(),
+    //   hour: date.getHours(),
+    //   minute: date.getMinutes()
+    // };
+
+    this.boardSize = 6;
     this.playerIndex = 0;
     this.diceValue = 1;
+
+
     this.load.image("dice-albedo", "./js/elements/dice-albedo.png");
     this.load.obj("dice-obj", "./js/elements/dice.obj");
     this.load.image('question-bg', './img/question-bg.png');
     this.load.image("correct-alert", "./img/alert-correct.webp");
     this.load.image("wrong-alert", "./img/alert-wrong.webp");
+
     switch (this.theme) {
       case 'forest-board':
         this.snakesAndLadders = [
@@ -117,17 +127,20 @@ class InGameScene extends Phaser.Scene {
       default:
         break;
     }
+
     this.load.on('progress', (value) => {
       this.loader = new Loader(this, value);
     });
   }
 
   create () {
+    console.log(this.date.toString());
     this.load.on('complete', () => {
       this.loader.destroy();
     });
-    this.add.image(0, 0, this.theme).setOrigin(0);
+    this.add.image(0, 0, this.theme).setOrigin(0); // board background
 
+    // quit the game
     const close = this.add.sprite(this.cameras.main.width - 50, 50, 'close');
     close.setScale(0.5);
     close.setInteractive({ cursor: 'pointer' });
@@ -138,68 +151,72 @@ class InGameScene extends Phaser.Scene {
       }
     });
 
-    const offset = 50;
-    const boardContainer = this.add.container(offset / 2, 100);
-    this.playerContainer = this.add.container(offset / 2, 100);
+    // board & snakeladder container
+    const offsetX = 50;
+    const boardContainer = this.add.container(offsetX / 2, 100);
 
-    this.board = createBoard(this, this.boardSize, offset);
+    this.board = createBoard(this, this.boardSize, offsetX);
     boardContainer.add(this.board.tileList);
-    // boardContainer.add(this.board.tileNumber);
 
     const snakesAndLadders = createSnakeAndLadder(this, this.board.tileList, this.snakesAndLadders);
     boardContainer.add(snakesAndLadders);
 
+    // players container
+    this.playerContainer = this.add.container(offsetX / 2, 100);
     this.players = [];
     for (let i = 0; i < this.numPlayers; i++) {
       const player = createPlayer(this, this.board.tileList, this.playerColors[i]);
       console.log(player.data.list);
       this.players.push(player);
 
-      this.updateStorage(player.name, player.getData('position'), player.getData('movementTotal'));
+      // init player data in local storage
+      this.updateStorage(player);
     }
+
     this.playerContainer.add(this.players);
     this.playerContainer.bringToTop(this.players[this.playerIndex]);
 
+    // helper text
     this.helperText = this.add.text(
       this.game.config.width / 2,
       this.game.config.height - 100,
       `${this.players[this.playerIndex].name}'s Turn`,
-      { ...FONT_STYLE, fill: "#fff", fontSize: "30px" }
-    ).setStroke(colors.black, 4).setOrigin(0.5);
+      { ...FONT_STYLE, fill: "#fff", fontSize: "36px" }
+    ).setStroke(COLORS.black, 4).setOrigin(0.5);
 
+    // dice area
     const dice = createDice(config.width / 2, config.height - 200, this, 1000);
-    // Dice hit area
     this.diceArea = this.add.rectangle(config.width / 2, config.height - 200, 100, 100, 0xffffff, 0);
     this.diceArea.setInteractive();
     this.diceArea.on('pointerup', () => {
       dice((value) => {
         this.diceValue = value;
         setTimeout(() => {
-          this.checkQuest(this.players[this.playerIndex], this.diceValue);
-          // this.scene.pause(this);
-          // this.scene.launch('QuestionScene');
+          this.checkPosition(this.players[this.playerIndex], this.diceValue); // check player current position
         }, 500);
       });
     });
 
+    // handle player after answering quest
     this.events.on('resume', (scene, data) => {
       if (data) {
-        this.updatePlayer(this.players[this.playerIndex], this.diceValue);
+        this.updatePlayer(this.players[this.playerIndex], this.diceValue); // correct answer
       } else {
-        this.updatePlayer(this.players[this.playerIndex], null);
+        this.updatePlayer(this.players[this.playerIndex], null); // null dice if wrong answer
       }
     });
   }
 
-  checkQuest (target, diceValue) {
+  checkPosition (target, diceValue) {
     const position = target.getData('position');
     const finish = this.boardSize * this.boardSize;
 
+    // launch question menu
     if (position + diceValue <= finish && diceValue !== null) {
       this.scene.pause(this);
       this.scene.launch('QuestionMenu');
     } else {
-      this.updateIndex();
+      this.updateIndex(); // skip to next player
     }
   }
 
@@ -207,13 +224,21 @@ class InGameScene extends Phaser.Scene {
     this.helperText.setAlpha(0);
     this.diceArea.removeInteractive();
 
-    const position = target.getData('position');
     const finish = this.boardSize * this.boardSize;
+    const position = target.getData('position');
+    const correct = target.getData('correctAnswer');
+    const wrong = target.getData('wrongAnswer');
+    const rolls = target.getData('rollTotal');
+    target.setData('rollTotal', rolls + 1);
 
     if (position + diceValue <= finish && diceValue !== null) {
+      target.setData('correctAnswer', correct + 1);
+      this.updateStorage(target);
       this.movePlayer(target, position, diceValue, this.board.tileList);
     } else {
-      this.updateIndex();
+      target.setData('wrongAnswer', wrong + 1);
+      this.updateStorage(target);
+      this.updateIndex(); // skip to next player if wrong answer
     }
   }
 
@@ -227,24 +252,23 @@ class InGameScene extends Phaser.Scene {
       duration: 300,
       onComplete: () => {
         steps--;
-        target.setData('position', tile.name);
+        target.setData('position', tile.name); // set new position
         if (steps > 0) {
           position++;
           this.movePlayer(target, position, steps, tiles);
         } else {
           if (tile.getData('moveTo')) {
-            const moveTo = tile.getData('moveTo');
+            // if on snake or ladder
             setTimeout(() => {
-              this.forceMove(target, moveTo, tiles);
+              this.forceMove(target, tile.getData('moveTo'), tiles);
             }, 500);
           } else {
-            const moveTotal = target.getData('movementTotal') + 1;
-            target.setData('movementTotal', moveTotal);
-            this.updateStorage(target.name, target.getData('position'), target.getData('movementTotal'));
+            this.updateStorage(target);
 
+            // if player on finish
             const currentPosition = target.getData('position');
             if (currentPosition >= this.boardSize * this.boardSize) {
-              this.winCondition(target);
+              this.winCondition(this.players);
               return;
             }
 
@@ -264,10 +288,8 @@ class InGameScene extends Phaser.Scene {
       ease: 'Linear',
       duration: 500,
       onComplete: () => {
-        target.setData('position', tile.name);
-        const moveTotal = target.getData('movementTotal') + 1;
-        target.setData('movementTotal', moveTotal);
-        this.updateStorage(target.name, target.getData('position'), target.getData('movementTotal'));
+        target.setData('position', tile.name); // set new position after moved
+        this.updateStorage(target);
         this.updateIndex();
       }
     });
@@ -283,22 +305,36 @@ class InGameScene extends Phaser.Scene {
     }, 500);
   }
 
-  updateStorage (playerName, position, movementTotal) {
-    const json = { name: playerName, position, movementTotal };
-    window.localStorage.setItem(playerName, JSON.stringify(json));
+  updateStorage (player) {
+    const json = {
+      name: player.name,
+      position: player.getData('position'),
+      correctAnswer: player.getData('correctAnswer'),
+      wrongAnswer: player.getData('wrongAnswer'),
+      rollTotal: player.getData('rollTotal')
+    };
+    window.localStorage.setItem(player.name, JSON.stringify(json));
   }
 
   winCondition (player) {
-    const data = {
-      winner: player.name,
-      movementTotal: player.getData('movementTotal'),
-      startDate: `${this.locale} ${this.time.hours}:${this.time.minutes}`
+    const dbRef = database.ref(`${gameId}`);
+    const newdata = dbRef.push();
+    let datalist = {
+      startTime: this.date.toString(),
+      playerData: [],
     };
-    historyData.push(data);
-    window.localStorage.setItem('game-log', JSON.stringify(historyData));
 
-    // Implementasi tampilan pesan kemenangan (misalnya, tampilkan pesan di layar)
-    this.helperText.setText(`${this.players[this.playerIndex].name} Win`);
+    this.players.map((data, i) => {
+      const obj = data.data.list;
+      datalist.playerData.push(obj);
+    });
+
+    newdata.set(datalist);
+    // historyData.push(data);
+    // window.localStorage.setItem('game-log', JSON.stringify(historyData));
+
+    // win message
+    this.helperText.setText(`${player.name} Win`);
 
     setTimeout(() => {
       this.scene.stop(this);

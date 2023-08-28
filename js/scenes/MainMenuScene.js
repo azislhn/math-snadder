@@ -7,7 +7,7 @@ class Loader extends Phaser.GameObjects.Container {
       0,
       scene.cameras.main.width,
       scene.cameras.main.height,
-      colors.black
+      COLORS.black
     ).setOrigin(0);
 
     scene.add.text(
@@ -53,14 +53,14 @@ class MainMenuScene extends Phaser.Scene {
   }
 
   preload () {
-    historyData = [];
-    this.logs = localStorage.getItem('game-log');
-    if (this.logs) {
-      this.historyList = JSON.parse(this.logs);
-      this.historyList.map((list, i) => {
-        historyData.push(list);
-      });
-    }
+    // historyData = [];
+    // this.logs = localStorage.getItem('game-log');
+    // if (this.logs) {
+    //   this.historyList = JSON.parse(this.logs);
+    //   this.historyList.map((list, i) => {
+    //     historyData.push(list);
+    //   });
+    // }
     this.load.image('background', './img/main-bg.jpg');
     this.load.image('close', './img/icons/close-btn.png');
     this.load.image('button', './img/icons/button.png');
@@ -100,16 +100,15 @@ class MainMenuScene extends Phaser.Scene {
     });
 
     const btnX = bg.width / 2;
-    const initBtnY = bg.height / 2 - 100;
-    createMainButton(this, btnX, initBtnY, "Play Game", () => {
+    const initBtnY = bg.height / 2;
+    createMainButton(this, btnX, initBtnY - 100, "Play Game", () => {
       this.scene.pause(this);
       this.scene.launch('PickPlayerMenu');
     });
-    createMainButton(this, btnX, initBtnY + 200, "Win History", () => {
-      // this.scene.pause(this);
-      this.scene.start('HistoryMenu', historyData);
-    });
-    createMainButton(this, btnX, initBtnY + 400, "How to Play", () => {
+    // createMainButton(this, btnX, initBtnY + 200, "Win History", () => {
+    //   this.scene.start('HistoryScene', historyData);
+    // });
+    createMainButton(this, btnX, initBtnY + 100, "How to Play", () => {
       this.scene.pause(this);
       this.scene.launch('HowtoPlayMenu');
     });

@@ -9,6 +9,7 @@
   "author": "azislhn",
   "license": "ISC",
   "dependencies": {
+    "firebase": "^10.3.0",
     "phaser": "^3.60.0"
   }
 }

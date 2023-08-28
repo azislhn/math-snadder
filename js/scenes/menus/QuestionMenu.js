@@ -99,7 +99,7 @@ class QuestionMenu extends Phaser.Scene {
             this.alert.showWrong();
           }
           setTimeout(() => {
-            this.scene.resume('InGameScene', result);
+            this.scene.resume('InGameScene', result); // passing boolean data
             this.scene.stop(this);
           }, 1000);
         }

@@ -61,7 +61,7 @@ class PickPlayerMenu extends Phaser.Scene {
       const btnWidth = 500;
       const btnHeight = 100;
 
-      const btn = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, colors.white, 0);
+      const btn = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, COLORS.white, 0);
       btn.setInteractive({ cursor: 'pointer' });
       btn.on('pointerover', () => {
         btn.fillAlpha = 0.2;
@@ -70,7 +70,7 @@ class PickPlayerMenu extends Phaser.Scene {
         btn.fillAlpha = 0;
       });
       btn.on('pointerup', () => {
-        this.scene.start('InGameScene', { theme: this.boardTheme, option: option, playerColors: this.playerColors });
+        this.scene.start('InGameScene', { theme: this.boardTheme, option: option, playerColors: this.playerColors.slice(0, option) });
       });
 
       const numText = this.add.text(
@@ -112,7 +112,7 @@ class PickPlayerMenu extends Phaser.Scene {
 
   updateView (targetTrue, targetFalse, theme) {
     this.boardTheme = theme;
-    targetTrue.setStrokeStyle(5, colors.white);
+    targetTrue.setStrokeStyle(5, COLORS.white);
     targetFalse.isStroked = false;
 
   }
